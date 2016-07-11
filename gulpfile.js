@@ -8,6 +8,8 @@
 var gulp = require('gulp');
 var gutil = require('gulp-util');
 var imageOp = require('gulp-image-optimization');
+var imagemin = require('gulp-imagemin');
+var imageminPngquant = require('imagemin-pngquant');
 
 /* Base path is relative to the directory the gulpfile.js file is placed */
 var BASEPATH = 'input';
@@ -45,5 +47,25 @@ gulp.task('gulp-image-optimization', function (cb) {
             )).pipe(gulp.dest(OUTPUT)).on('end', cb).on('error', cb);
 });
 
+/* Gulp image optimization task */
+gulp.task('gulp-imagemin', function (cb) {
+	GULP_IMAGE_TYPES = ['.png'];
+    var src = BASEPATH + WILDCARD;
+    gutil.log('Optimizing directory: ' + src);
+    gutil.log('Optimizing images of type: ' + GULP_IMAGE_TYPES);
+    var srcArr = [];
+    GULP_IMAGE_TYPES.forEach(function (item, index) {
+        srcArr.push(src + item)
+    });
+    gutil.log('Optimizing at: ' + srcArr);
+    gulp.src(srcArr).pipe(
+        imagemin(
+		[
+			imageminPngquant({quality: '0-50'})
+		]
+            )).pipe(gulp.dest(OUTPUT)).on('end', cb).on('error', cb);
+});
+
 /* Images task for Gulp CLI */
 gulp.task('images', ['gulp-image-optimization']);
+gulp.task('images', ['gulp-imagemin']);
